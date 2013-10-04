@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems":
+    [
+        {
+            "name": "GHC",
+            "cmd": ["./go"],
+            "working_dir": "/home/chris/Projects/tictactoe",
+            "shell":true
+        }
+    ]
+}
