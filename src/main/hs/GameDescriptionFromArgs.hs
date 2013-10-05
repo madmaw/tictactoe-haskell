@@ -22,7 +22,7 @@ createGameDescriptionWithDefaultFromArgs (GameDescription _ numberOfPlayers numb
 	let diagonalMaybe = maybeRead diagonalString
 	case diagonalMaybe of
 		Just diagonal -> createGameDescriptionWithDefaultFromArgs (GameDescription diagonal numberOfPlayers numberOfHumanPlayers) xs
-		(Nothing) -> ErrorDiagonalNotNumber
+		Nothing -> ErrorDiagonalNotNumber
 createGameDescriptionWithDefaultFromArgs defaultGameDescription ("-p":numberOfPlayersString:xs) = do
 	let numberOfPlayersMaybe = maybeRead numberOfPlayersString
 	createGameDescriptionWithDefaultFromNumberOfPlayersString defaultGameDescription numberOfPlayersMaybe xs

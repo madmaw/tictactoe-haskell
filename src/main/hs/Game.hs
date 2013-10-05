@@ -1,22 +1,24 @@
 module TicTacToe.Game(
-	Mark(..),
-	Move(..),
+	Token(..),
+	Action(..),
 	Player(..),
 	Mind(..),
 	MindInstance(..),
+	Board(..),
 	Game(..),
 	GameWinState(..)
 ) where	
 
 import Data.Maybe
+import Data.Map
 
-data Move = PlaceToken {
-	x::Integer,
-	y::Integer
-} | Pass deriving Show
+data Action = AddToken {
+	addToken::Token,
+	addAt::(Int, Int)
+} | Pass | Fail String deriving Show
 
 class (Show a) => Mind a where 
-	think :: a -> Game -> IO((a, Move))
+	think :: a -> Player -> Board -> IO((a, Action))
 
 
 data MindInstance = forall m. Mind m => MindInstance m 
@@ -24,37 +26,69 @@ instance Show MindInstance where
 	show (MindInstance m) = show m
 
 data Player = Player {
-	name::String, 
-	mind::MindInstance
-} deriving Show
+	name::String
+} deriving (Show, Ord, Eq)
 
-
-
-data Mark = 
-	Token {
-		owner::Player
+data Token = 
+	Claim {
+		forPlayer::Player
 	} | 
-	Obstacle | 
-	Empty deriving Show
+	Obstacle deriving Show
 
 data GameWinState = 
 	Undecided | 
 	Draw |
 	Won { 
-		winner::Player
+		winningPlayer::Player
 	} deriving Show
 
 data Game = Game {
 	boardWidth::Int,
 	boardHeight::Int,
 	minimumSequenceLength::Int,
-	marks::[[Mark]],
-	players::[Player], 
-	currentPlayer::Player,
-	winningPlayer::GameWinState
+	players::[Player]
 } deriving Show
 
---act::Game -> Move -> ActionResult
+data Board = Board {
+	game::Game,
+	tiles::[[Maybe Token]],
+	currentPlayer::Player,
+	winState::GameWinState,
+	minds::Map Player MindInstance
+} deriving Show
+
+data BoardTransition = 
+	TokenAddedToBoard {
+		addedAt::(Int, Int),
+		addedToken::Token
+	} | 
+	Passed
+
+
+data ActionResult = 
+	InvalidAction Action | 
+	Success [(Board, BoardTransition)]
+
+act::Board -> Action -> ActionResult
+act Board{game=game, tiles=tiles, currentPlayer=currentPlayer, winState=winState, minds=minds} (AddToken token at) = do
+	let tiles' = tiles
+	let currentPlayer' = currentPlayer
+	let winState' = winState
+	let minds' = minds
+	let board' = Board{
+		game = game,
+		tiles = tiles',
+		currentPlayer = currentPlayer',
+		winState = winState', 
+		minds = minds'
+	}
+	Success [(board', TokenAddedToBoard{addedAt=at, addedToken=token})]
+
+act board Pass = Success [(board, Passed)]
+act _ action = InvalidAction action
+
+
+
 
 
 
