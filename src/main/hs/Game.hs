@@ -6,11 +6,14 @@ module TicTacToe.Game(
 	MindInstance(..),
 	Board(..),
 	Game(..),
-	GameWinState(..)
+	GameWinState(..), 
+	ActionResult(..),
+	act
 ) where	
 
 import Data.Maybe
 import Data.Map
+import Data.Sequence
 
 data Action = AddToken {
 	addToken::Token,
@@ -46,15 +49,14 @@ data Game = Game {
 	boardWidth::Int,
 	boardHeight::Int,
 	minimumSequenceLength::Int,
-	players::[Player]
+	players::Seq Player
 } deriving Show
 
 data Board = Board {
 	game::Game,
-	tiles::[[Maybe Token]],
+	tiles::Seq (Seq (Maybe Token)),
 	currentPlayer::Player,
-	winState::GameWinState,
-	minds::Map Player MindInstance
+	winState::GameWinState
 } deriving Show
 
 data BoardTransition = 
@@ -62,7 +64,7 @@ data BoardTransition =
 		addedAt::(Int, Int),
 		addedToken::Token
 	} | 
-	Passed
+	Passed deriving Show
 
 
 data ActionResult = 
@@ -70,22 +72,36 @@ data ActionResult =
 	Success [(Board, BoardTransition)]
 
 act::Board -> Action -> ActionResult
-act Board{game=game, tiles=tiles, currentPlayer=currentPlayer, winState=winState, minds=minds} (AddToken token at) = do
-	let tiles' = tiles
-	let currentPlayer' = currentPlayer
-	let winState' = winState
-	let minds' = minds
-	let board' = Board{
-		game = game,
-		tiles = tiles',
-		currentPlayer = currentPlayer',
-		winState = winState', 
-		minds = minds'
-	}
-	Success [(board', TokenAddedToBoard{addedAt=at, addedToken=token})]
-
 act board Pass = Success [(board, Passed)]
+act Board{game=game, tiles=tiles, currentPlayer=currentPlayer} action@AddToken{addAt=addAt, addToken=addToken} = do
+	-- set tile at x,y
+	let (x, y) = addAt
+	let tile = index (index tiles y) x
+	case tile of
+		Nothing -> do
+			let Game{players=players} = game
+			let tilesY = index tiles y
+			let tilesY' = Data.Sequence.update x (Just addToken) tilesY
+			let tiles' = Data.Sequence.update y tilesY' tiles
+			let (Just currentPlayerIndex) = elemIndexL currentPlayer players
+			let currentPlayerIndex' = (currentPlayerIndex + 1) `mod` (Data.Sequence.length players)
+			let currentPlayer' = index players currentPlayerIndex'
+			let winState' = calculateWinState tiles'
+			-- TODO set new mind state
+			let board' = Board{
+				game = game,
+				tiles = tiles',
+				currentPlayer = currentPlayer',
+				winState = winState'
+			}
+			Success[(board', TokenAddedToBoard{addedAt=addAt, addedToken=addToken})]
+		otherwise -> do
+			InvalidAction action
 act _ action = InvalidAction action
+
+calculateWinState::Seq (Seq (Maybe Token)) -> GameWinState
+calculateWinState tiles = Undecided
+
 
 
 

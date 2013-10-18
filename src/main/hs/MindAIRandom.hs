@@ -4,6 +4,7 @@ module TicTacToe.MindAIRandom(
 ) where
 
 import System.Random
+import Data.Sequence
 import Debug.Trace(trace)
 import TicTacToe.Game(Mind(..), Action(..), Token(..), Board(..), Game(..), Player(..))
 
@@ -31,7 +32,7 @@ findFreeAction rng board@(Board{tiles = tiles, game=(Game{boardWidth = boardWidt
 	let (yr, rng'') = next rng'
 	let x = xr `mod` boardWidth
 	let y = yr `mod` boardHeight 
-	let tile = trace ((show xr) ++ "/" ++ (show yr)) (tiles!!x!!y)
+	let tile = trace ((show xr) ++ "/" ++ (show yr)) (index (index tiles x) y)
 	case tile of
 		Nothing -> (rng'', AddToken (Claim player) (x, y)) 
 		Just _ -> findFreeAction rng'' board player (persistenceRemaining-1)

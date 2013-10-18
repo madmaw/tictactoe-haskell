@@ -10,8 +10,9 @@ data MindStream = MindStream {
 } deriving Show
 
 instance Mind MindStream where
-	think mind@(MindStream input) player game = do
+	think mind@(MindStream input) player board = do
 		line <- hGetLine input
 		-- TODO handle exceptions
 		let pos = read line
 		return (mind, AddToken (Claim player) pos)
+

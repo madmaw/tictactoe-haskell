@@ -4,6 +4,7 @@ module TicTacToe.GameDescription(
 ) where
 
 import Data.Map
+import Data.Sequence
 import System.Random
 import System.IO
 
@@ -17,33 +18,34 @@ data GameDescription = GameDescription {
 	numberOfHumanPlayers::Int 
 } deriving Show
 
-createGameFromGameDescription::GameDescription -> Int -> Board
+createGameFromGameDescription::GameDescription -> Int -> (Board, Map Player MindInstance)
 createGameFromGameDescription (GameDescription boardDiagonal numberOfPlayers numberOfHumanPlayers) rngSeed = do
 	let tiles = createTiles boardDiagonal
 	let players = createPlayers numberOfPlayers 1
-	let minds = createMinds players numberOfHumanPlayers (boardDiagonal * boardDiagonal) rngSeed
+	let minds = createMinds (viewl players) numberOfHumanPlayers (boardDiagonal * boardDiagonal) rngSeed
 	let game = Game boardDiagonal boardDiagonal boardDiagonal players 
-	Board {
+	let board = Board {
 		game=game,
 		tiles=tiles,
-		currentPlayer=(head players), 
-		winState=Undecided,
-		minds=minds
+		currentPlayer=(index players 0), 
+		winState=Undecided
 	}
+	(board, minds)
 
-createTiles::Int->[[Maybe Token]]
-createTiles diagonal = replicate diagonal (replicate diagonal Nothing)
+createTiles::Int->Seq (Seq (Maybe Token))
+createTiles diagonal = Data.Sequence.replicate diagonal (Data.Sequence.replicate diagonal Nothing)
 
-createPlayers::Int->Int->[Player]
-createPlayers 0 _ = []
+createPlayers::Int->Int->Seq Player
+createPlayers 0 _ = Data.Sequence.empty
 createPlayers numberOfPlayers playerNumber = do
 	let player = Player (show playerNumber)
-	player:(createPlayers (numberOfPlayers - 1) (playerNumber + 1))
+	let rest = (createPlayers (numberOfPlayers - 1) (playerNumber + 1))
+	player <| rest
 
-createMinds::[Player]->Int->Int->Int->Map Player MindInstance
-createMinds [] _ _ _ = fromList []
-createMinds (player:xs) numberOfHumanPlayers persistence rngSeed = do
-	let map = createMinds xs (numberOfHumanPlayers-1) persistence (rngSeed+1)
+createMinds::ViewL Player->Int->Int->Int->Map Player MindInstance
+createMinds EmptyL _ _ _ = Data.Map.fromList []
+createMinds (player:<xs) numberOfHumanPlayers persistence rngSeed = do
+	let map = createMinds (viewl xs) (numberOfHumanPlayers-1) persistence (rngSeed+1)
 	let mind = createMind (numberOfHumanPlayers > 0) persistence rngSeed
 	insert player mind map
 
