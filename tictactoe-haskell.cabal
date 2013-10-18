@@ -1,0 +1,16 @@
+name: tictactoe-haskell
+version: 0.0.1
+cabal-version: >=1.2
+build-type: Simple
+license: AllRightsReserved
+license-file: ""
+synopsis: Tic Tac Toe Game
+description:
+data-dir: ""
+
+executable tictactoe-haskell
+    build-depends: QuickCheck -any, base -any
+    main-is: TicTacToe.hs
+    buildable: True
+    hs-source-dirs: src/main/hs
+
