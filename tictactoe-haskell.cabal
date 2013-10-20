@@ -5,12 +5,13 @@ build-type: Simple
 license: AllRightsReserved
 license-file: ""
 synopsis: Tic Tac Toe Game
-description:
 data-dir: ""
-
+ 
 executable tictactoe-haskell
-    build-depends: QuickCheck -any, base -any
+    build-depends: QuickCheck -any, base -any, containers -any,
+                   random -any, time -any
     main-is: TicTacToe.hs
     buildable: True
+    extensions: ExistentialQuantification
     hs-source-dirs: src/main/hs
-
+ 

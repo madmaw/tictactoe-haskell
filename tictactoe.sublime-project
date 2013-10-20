@@ -7,11 +7,5 @@
 	],
 	"build_systems":
     [
-        {
-            "name": "GHC",
-            "cmd": ["./go"],
-            "working_dir": "/home/chris/Projects/tictactoe-haskell",
-            "shell":true
-        }
     ]
 }
