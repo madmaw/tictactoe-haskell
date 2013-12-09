@@ -1,4 +1,4 @@
-module TicTacToe.GameDescriptionFromArgs
+module TicTacToe.CLI.GameDescriptionFromArgs
 (
 	GameDescriptionFromArgs(..),
 	createGameDescriptionFromArgs
@@ -6,15 +6,15 @@ module TicTacToe.GameDescriptionFromArgs
 
 import TicTacToe.GameDescription(GameDescription(..))
 
-data GameDescriptionFromArgs = 
-	Success GameDescription | 
-	ErrorDiagonalNotNumber | 
-	ErrorNumberOfPlayersNotNumber | 
+data GameDescriptionFromArgs =
+	Success GameDescription |
+	ErrorDiagonalNotNumber |
+	ErrorNumberOfPlayersNotNumber |
 	ErrorAtLeastOnePlayerRequired |
 	ErrorUnrecognizedArgument String deriving Show
 
 createGameDescriptionFromArgs::[String] -> GameDescriptionFromArgs
-createGameDescriptionFromArgs = createGameDescriptionWithDefaultFromArgs $ GameDescription 3 2 1 
+createGameDescriptionFromArgs = createGameDescriptionWithDefaultFromArgs $ GameDescription 3 2 1
 
 createGameDescriptionWithDefaultFromArgs::GameDescription ->[String] -> GameDescriptionFromArgs
 createGameDescriptionWithDefaultFromArgs g [] = Success g

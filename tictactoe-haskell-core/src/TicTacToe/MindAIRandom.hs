@@ -19,7 +19,7 @@ data MindAIRandom = MindAIRandom {
 
 instance Mind MindAIRandom where
         think (MindAIRandom persistence rngInstance) player board = do
-                case rngInstance of 
+                case rngInstance of
                         RandomGenInstance rng -> do
                                 let (rng', action) = findFreeAction rng board player persistence
                                 return (MindAIRandom persistence (RandomGenInstance rng'), action)
@@ -31,8 +31,8 @@ findFreeAction rng board@(Board{tiles = tiles, game=(Game{boardWidth = boardWidt
         let (xr, rng') = next rng
         let (yr, rng'') = next rng'
         let x = xr `mod` boardWidth
-        let y = yr `mod` boardHeight 
-        let tile = trace ((show xr) ++ "/" ++ (show yr)) (index (index tiles x) y)
+        let y = yr `mod` boardHeight
+        let tile = (index (index tiles y) x)
         case tile of
-                Nothing -> (rng'', AddToken (Claim player) (x, y)) 
+                Nothing -> (rng'', AddToken (Claim player) (x, y))
                 Just _ -> findFreeAction rng'' board player (persistenceRemaining-1)

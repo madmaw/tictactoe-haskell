@@ -1,0 +1,17 @@
+name: tictactoe-haskell-cli
+version: 0.0.1
+cabal-version: >=1.2
+build-type: Simple
+license: AllRightsReserved
+license-file: ""
+data-dir: ""
+
+executable tictactoe-haskell-cli
+    build-depends: QuickCheck -any, base -any, containers -any,
+                   random -any, time -any, tictactoe-haskell-core -any
+    main-is: Main.hs
+    buildable: True
+    extensions: ExistentialQuantification
+    hs-source-dirs: src
+    other-modules: TicTacToe.CLI.RenderToConsole TicTacToe.CLI.GameDescriptionFromArgs
+
