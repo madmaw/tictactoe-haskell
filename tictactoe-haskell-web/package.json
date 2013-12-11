@@ -1,0 +1,9 @@
+{
+  "name": "tictactoe-haskell-web",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-fay": "git://github.com/mkaemmerer/grunt-fay.git#686c61243decf8edfe9fe4c38dfd72cb620f8641",
+    "async": "~0.2.9"
+  }
+}

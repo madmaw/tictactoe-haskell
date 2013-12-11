@@ -9,10 +9,14 @@ category: Game
 -- data-dir: ""
 
 library
-    build-depends: base -any, containers -any,
-                   random -any, time -any
-    exposed-modules: TicTacToe.Game TicTacToe.GameDescription
-                     TicTacToe.MindAIRandom TicTacToe.MindStream
+    build-depends:
+        base -any,
+        containers -any,
+        random -any,
+        time -any
+    exposed-modules:
+        TicTacToe.Game
+        TicTacToe.GameDescription
     exposed: True
     buildable: True
     extensions: ExistentialQuantification

@@ -4,15 +4,19 @@ cabal-version: >=1.2
 build-type: Simple
 license: AllRightsReserved
 license-file: ""
--- description:
+description:
 data-dir: ""
 
 executable tictactoe-haskell-web
-    build-depends: base < 5, haste-lib -any, containers -any,
-                   random -any, time -any, tictactoe-haskell-core -any
+    build-depends:
+        base < 5,
+        containers -any,
+        haste-lib -any,
+        random -any,
+        tictactoe-haskell-core -any
     main-is: Main.hs
     buildable: True
     extensions: ExistentialQuantification
     hs-source-dirs: src
-    other-modules:
     ghc-options: --out=dist/ttt.js
+

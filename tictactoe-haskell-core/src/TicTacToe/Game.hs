@@ -3,7 +3,6 @@ module TicTacToe.Game(
         Action(..),
         Player(..),
         Mind(..),
-        MindInstance(..),
         Board(..),
         BoardTransition(..),
         Game(..),
@@ -17,19 +16,24 @@ import Data.Maybe
 import Data.Map
 import Data.Sequence
 import Data.List;
+import System.Random
+import System.IO(Handle, hGetLine);
 
 data Action = AddToken {
         addToken::Token,
         addAt::(Int, Int)
 } | Pass | Fail String deriving Show
 
-class (Show a) => Mind a where
-        think :: a -> Player -> Board -> IO((a, Action))
+data Mind =
+    MindRandom {
+        persistence::Int,
+        randomGenerator::StdGen
+    } |
+    MindStream {
+        input::Handle
+    } deriving Show
 
 
-data MindInstance = forall m. Mind m => MindInstance m
-instance Show MindInstance where
-        show (MindInstance m) = show m
 
 data Player = Player {
         name::String
@@ -154,7 +158,29 @@ mergeToPairs::[a]->b->[(a,b)]
 mergeToPairs [] _ = []
 mergeToPairs (x:xs) y = (x,y):mergeToPairs xs y
 
+think::Mind -> Player -> Board -> IO((Mind, Action))
+think MindRandom{persistence=persistence, randomGenerator=rng} player board = do
+        let (rng', action) = findFreeAction rng board player persistence
+        return (MindRandom persistence rng', action)
+think mind@MindStream{input=input} player board = do
+        line <- hGetLine input
+        -- TODO handle exceptions
+        let pos = read line
+        return (mind, AddToken (Claim player) pos)
 
+
+
+findFreeAction::StdGen -> Board -> Player -> Int -> (StdGen, Action)
+findFreeAction rng _ _ 0 = (rng, Pass)
+findFreeAction rng board@(Board{tiles = tiles, game=(Game{boardWidth = boardWidth, boardHeight = boardHeight})}) player persistenceRemaining = do
+        let (xr, rng') = next rng
+        let (yr, rng'') = next rng'
+        let x = xr `mod` boardWidth
+        let y = yr `mod` boardHeight
+        let tile = (index (index tiles y) x)
+        case tile of
+                Nothing -> (rng'', AddToken (Claim player) (x, y))
+                Just _ -> findFreeAction rng'' board player (persistenceRemaining-1)
 
 
 
